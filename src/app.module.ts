@@ -1,10 +1,12 @@
 import { ApiModule } from './api/api.module';
+import { CacheConnection } from './modules/redis-cache/cache.connection';
 import { MessageBrokerModule, MessageBrokerService } from './modules/message-broker';
 import { Module } from '@nestjs/common';
+import { RedisCacheModule } from './modules/redis-cache/redis-cache.module';
+import { WebsocketModule } from './modules/websocket/websocket.module';
 
 @Module({
     imports: [
-        ApiModule,
         MessageBrokerModule.forRoot(
             {
                 provide: MessageBrokerService,
@@ -17,6 +19,17 @@ import { Module } from '@nestjs/common';
                 inject: [],
             }
         ),
+        RedisCacheModule.forRoot({
+            provide: CacheConnection,
+            useFactory() {
+                return {
+                    redisConnection: 'redis://:@127.0.0.1:6379'
+                }
+            },
+            inject: []
+        }),
+        WebsocketModule,
+        ApiModule,
     ],
     controllers: [],
     providers: [],
